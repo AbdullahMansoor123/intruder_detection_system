@@ -1,8 +1,11 @@
 import glob
 import os
+import random
 
 import cv2
 import numpy as np
+
+import tempfile
 import streamlit as st
 
 
@@ -42,8 +45,10 @@ def video_capture(source):
         os.mkdir('output')
     else:
         pass
-
-    output_video_path = os.path.join(output_path, os.path.basename(source).split('.')[0]) + '_output.mp4'
+    # filename = st.text_input(random.randint(1,10000))
+    filename = st.text_input()
+    st.write('The current movie title is', filename)
+    output_video_path = os.path.join(output_path, filename + '_output.mp4')
     output_video = cv2.VideoWriter(output_video_path, cv2.VideoWriter.fourcc(*'mp4v'), fps, size)
 
     # background subtractor
@@ -111,14 +116,17 @@ def video_capture(source):
 def main():
     st.title("Motion Detection System")
 
-    path = os.getcwd()
-    input_vid_files = glob.glob(path + '/input/*.mp4')
-    vid_names = tuple(os.path.basename(f) for f in input_vid_files)
-    vid_name = st.selectbox("Select video file", tuple(vid_names))  # change files to files_plus_cam for camera
-    # excess as well
-
-    source = os.path.join(path, 'input', vid_name)
-    video_capture(source)
+    # path = os.getcwd()
+    # input_vid_files = glob.glob(path + '/input/*.mp4')
+    # vid_names = tuple(os.path.basename(f) for f in input_vid_files)
+    # vid_name = st.selectbox("Select video file", tuple(vid_names))  # change files to files_plus_cam for camera
+    # # excess as well
+    #
+    # source = os.path.join(path, 'input', vid_name)
+    f = st.file_uploader("Upload file")
+    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile.write(f.read())
+    video_capture(tfile.name)
 
 
 if __name__ == "__main__":
