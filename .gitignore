@@ -1,2 +1,5 @@
 /temp.py
 /.idea
+.env
+slack_alert.py
+artifacts/
