@@ -1,4 +1,5 @@
 import os
+
 import cv2
 import numpy as np
 from config import * 
@@ -17,6 +18,7 @@ def video_writer(video_cap):
     return output_video_obj
 
 
+
 def draw_roi(image):
     # Display the image
     cv2.imshow('Select ROI', image)
@@ -29,6 +31,7 @@ def draw_roi(image):
     return roi
 
 
+
 def region_checker(frame, results, roi):
     """
     :param zone: Zone under observation
@@ -36,22 +39,28 @@ def region_checker(frame, results, roi):
     :param zc: zone color
     :return: draw and change person bbox when enter specific zone
     """
+
+    #zone points
     zpt = [(int(roi[0]), int(roi[1])), 
            (int(roi[0])+int(roi[2]), int(roi[1])), 
-           (int(roi[0])+int(roi[2]),int(roi[1]+roi[3])),
+           (int(roi[0])+int(roi[2]),int(roi[1])+int(roi[3])),
            (int(roi[0]),int(roi[1]+roi[3]))]
+    
+
+    # row: coordinates of the detected person
+
+    x1, y1, w1,h1 = int(roi[0]), int(roi[1]), (int(roi[2])-int(roi[0])) , (int(roi[3]) - int(roi[1]))
+     
     for result in results[0]:
-        bbox = result.boxes.data[0][:4]
-
-        # row: coordinates of the detected person
-        x1, y1, x2, y2 = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
-        bbox_point = int(x2), int((y1+y2)/2)
-        inside_region = cv2.pointPolygonTest(np.array(zpt), bbox_point, False)
-
         # check if person is inside the zone
-        if inside_region > 0:
-            cv2.rectangle(frame, (x1, y1), (x2, y2), red, 1)
-            drawBannerText(frame, 'Intruder ALERT!!!', text_color=red)
+        bbox = result.boxes.data[0][:4]
+        bx1, by1, bx2, by2 = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+        x2, y2, w2, h2 = bx1, by1 ,bx2-bx1 ,by2-by1
+
+        if (x1 < bx2 + w2 or x1 + w1 > x2 or y1 < y2 + h2 or y1 + h1 > y2):
+            cv2.rectangle(frame, (bx1, by1), (bx2, by2), red, 1)
+            drawBannerText(frame, 'INTRUDER ALERT!!!', text_color=red)
+
         else:
             pass
     return frame
@@ -88,6 +97,7 @@ def plot_bboxes(results, frame, conf_thres):
             # display_text(frame, f'{conf}', x1, y1, (255, 255, 255))
 
     return frame
+
 
 
 def drawBannerText(frame, text, banner_height_percent=0.08, font_scale=0.8, text_color=(0, 255, 0),

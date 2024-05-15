@@ -3,3 +3,8 @@
 .env
 slack_alert.py
 artifacts/
+misc/
+logs/
+extra.py
+logger.py
+__pycache__/

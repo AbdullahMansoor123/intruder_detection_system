@@ -1,10 +1,12 @@
+import os, sys
 import cv2
+from exception import CustomException
 
 from ultralytics import YOLO
 
 from config import *
 from utils import draw_roi,region_checker, plot_bboxes, video_writer ,drawBannerText
-from exception import CustomException
+
 
 
 #capture video
@@ -37,7 +39,6 @@ try:
         cv2.imshow('Output', frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-
 
     video_cap.release()
     cv2.destroyAllWindows()
