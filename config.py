@@ -1,0 +1,9 @@
+output_video_path = r"C:\Users\Thunder\PycharmProjects\intruder_detection\output_videos"
+sample_video  = r'sample_videos\intruder.mp4'
+model_weights = r"artifacts/yolov8n.pt"
+fontFace = 2
+fontScale = 0.7
+fontThickness = 1
+yellow = (0, 255, 255)
+red = (0, 0, 255)
+green = (0, 255, 0)
