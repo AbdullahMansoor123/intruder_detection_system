@@ -64,7 +64,7 @@ def display_text(frame, text, left, top, color):
     cv2.putText(frame, text, (left, top), fontFace, fontScale, (255, 255, 255), fontThickness, cv2.LINE_AA)
 
 
-def plot_bboxes(results, frame, conf_thres):
+def plot_bboxes(results, frame, last_bbox):
     """
     :param results: logits from the model
     :param frame: frame of video after point polygon check
@@ -72,14 +72,20 @@ def plot_bboxes(results, frame, conf_thres):
     """
     
     yolo_class = ['person']
+    conf_thres = 0.3
     textSize = cv2.getTextSize(yolo_class[0], fontFace, fontScale, fontThickness)
     text_w = textSize[0][0]
     text_h = textSize[0][1]
-
+    
     for result in results[0]:
         bbox = result.boxes.data[0][:4]
         conf = result.boxes.data[0][4]
         label = result.boxes.data[0][5]
+        
+        if len(bbox) ==0:
+            bbox = last_bbox
+        else:
+            last_bbox = bbox
 
         if conf >= conf_thres:
             x1, y1, x2, y2 = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
@@ -87,7 +93,7 @@ def plot_bboxes(results, frame, conf_thres):
             cv2.rectangle(frame, (x1, y1), (x2, y2), green, 1)
             # display_text(frame, f'{conf}', x1, y1, (255, 255, 255))
 
-    return frame
+    return frame, last_bbox
 
 
 def drawBannerText(frame, text, banner_height_percent=0.08, font_scale=0.8, text_color=(0, 255, 0),
